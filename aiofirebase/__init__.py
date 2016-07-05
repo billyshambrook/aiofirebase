@@ -88,6 +88,11 @@ class FirebaseHTTP:
         url = posixpath.join(self._base_url, path.strip('/')) if path else self._base_url
         url += '.json'
         data = json.dumps(value) if value else None
-        async with self._session.request(method, url, data=data, params=params) as resp:
+        params = params or {}
+        headers = {}
+        if self._auth:
+            params.update({'auth': self._auth})
+            headers.update({'typ': 'JWT', 'alg': 'HS256'})
+        async with self._session.request(method, url, data=data, params=params, headers=headers) as resp:
             assert resp.status == 200
             return await resp.json()
