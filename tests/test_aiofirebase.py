@@ -64,7 +64,7 @@ async def test_request(http_client):
     """Test ClientSession.request arguments."""
     await http_client._request(method='GET')
     assert http_client._session.request.called
-    http_client._session.request.assert_called_with('GET', 'http://mydatabase.json', data=None, params=None)
+    http_client._session.request.assert_called_with('GET', 'http://mydatabase.json', data=None, params={})
 
 
 @pytest.mark.asyncio
@@ -78,7 +78,7 @@ async def test_request_path(http_client, test_input, expected):
     """Test ClientSession.request arguments for different path values."""
     await http_client._request(method='GET', path=test_input)
     assert http_client._session.request.called
-    http_client._session.request.assert_called_with('GET', expected, data=None, params=None)
+    http_client._session.request.assert_called_with('GET', expected, data=None, params={})
 
 
 @pytest.mark.asyncio
@@ -87,7 +87,7 @@ async def test_request_value(http_client):
     await http_client._request(method='POST', value={'hello': 'world'})
     assert http_client._session.request.called
     http_client._session.request.assert_called_with(
-        'POST', 'http://mydatabase.json', data='{"hello": "world"}', params=None)
+        'POST', 'http://mydatabase.json', data='{"hello": "world"}', params={})
 
 
 @pytest.mark.asyncio
