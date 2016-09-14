@@ -35,23 +35,23 @@ class FirebaseHTTP:
         """Gracefully close the session."""
         await self._session.close()
 
-    async def get(self, *, path=None, params=None):
+    async def get(self, *, path=None, params={}):
         """Perform a GET request."""
         return await self._request(method='GET', path=path, params=params)
 
-    async def put(self, *, value, path=None, params=None):
+    async def put(self, *, value, path=None, params={}):
         """Perform a put request."""
         return await self._request(method='PUT', value=value, path=path, params=params)
 
-    async def post(self, *, value, path=None, params=None):
+    async def post(self, *, value, path=None, params={}):
         """Perform a POST request."""
         return await self._request(method='POST', value=value, path=path, params=params)
 
-    async def patch(self, *, value, path=None, params=None):
+    async def patch(self, *, value, path=None, params={}):
         """Perform a PATCH request."""
         return await self._request(method='PATCH', value=value, path=path, params=params)
 
-    async def delete(self, *, path=None, params=None):
+    async def delete(self, *, path=None, params={}):
         """Perform a DELETE request."""
         return await self._request(method='DELETE', path=path, params=params)
 
@@ -83,11 +83,13 @@ class FirebaseHTTP:
             elif key == 'data':
                 await callback(event=event, data=json.loads(value))
 
-    async def _request(self, *, method, value=None, path=None, params=None):
+    async def _request(self, *, method, value=None, path=None, params={}):
         """Perform a request to Firebase."""
         url = posixpath.join(self._base_url, path.strip('/')) if path else self._base_url
         url += '.json'
         data = json.dumps(value) if value else None
+        if self._auth:
+            params['auth'] = self._auth
         async with self._session.request(method, url, data=data, params=params) as resp:
             assert resp.status == 200
             return await resp.json()
