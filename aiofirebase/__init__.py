@@ -58,10 +58,11 @@ class FirebaseHTTP:
     async def stream(self, *, callback, path=None):
         """Hook up to the EventSource stream."""
         url = posixpath.join(self._base_url, path) if path else self._base_url
+        url += '.json'
         headers = {'accept': 'text/event-stream'}
-        async with self._session.get(url, headers=headers) as resp:
+        async with self._session.get(url, headers=headers, timeout=None) as resp:
             while True:
-                await FirebaseHTTP._iterate_over_stream(resp.content.read(), callback)
+                await FirebaseHTTP._iterate_over_stream(resp.content, callback)
 
     @staticmethod
     async def _iterate_over_stream(iterable, callback):
@@ -72,7 +73,7 @@ class FirebaseHTTP:
             if not msg_str:
                 continue
 
-            key, value = msg_str.split(':', 1)
+            key, value = msg_str.split(': ', 1)
 
             if key == 'event' and value == 'cancel':
                 raise StreamCancelled('The requested location is no longer allowed due to security/rules changes.')
